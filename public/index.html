@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produktadministration</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-content">Product Manager</div>
+    </header>
+
+    <main class="page">
+        <section class="panel" aria-labelledby="page-title">
+            <h1 id="page-title">Produktadministration</h1>
+
+            <form class="product-form">
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="name">Produktnamn</label>
+                        <input id="name" name="name" type="text" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="price">Pris</label>
+                        <input id="price" name="price" type="number" min="0.01" step="0.01" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="sku">SKU</label>
+                        <input id="sku" name="sku" type="text" required>
+                    </div>
+
+                    <div class="field field-description">
+                        <label for="description">Beskrivning</label>
+                        <textarea id="description" name="description" rows="6" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button">Lägg till produkt</button>
+                </div>
+            </form>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Produkt</th>
+                            <th scope="col">SKU</th>
+                            <th scope="col">Pris</th>
+                            <th scope="col"><span class="visually-hidden">Åtgärder</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="empty-row">
+                            <td colspan="4">Inga produkter att visa ännu.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

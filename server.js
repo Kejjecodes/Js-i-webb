@@ -1,4 +1,7 @@
+import express from "express";
+import db from "./db/db.js";
 const app = express();
+const database = require("products.db");
 
 
 app.use(express.static("public"));

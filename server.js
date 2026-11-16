@@ -1,7 +1,6 @@
-import express from "express";
-import db from "./db/db.js";
+const express = require("express");
 const app = express();
-const database = require("products.db");
+const database = require("./db/db");
 
 
 app.use(express.static("public"));
@@ -9,11 +8,15 @@ app.use(express.static("public"));
 
 const port = 8000;
 
+app.get("/api/products", (req, res) => {
+    const products = database.prepare("SELECT id, name, price FROM products").all();
+    res.json(products);
+});
 
-// Här börjar vi lyssna efter inkommande anrop över localhost:8000
-
+app.get("/", (req, res) => {
+    res.send("Välkommen till produktdatabasen!");
+});
 
 app.listen(port, () => {
-
-
     console.log(`Listening on port ${port}`)
+});

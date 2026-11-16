@@ -9,9 +9,9 @@ app.use(express.static("public"));
 
 const port = 8000;
 
-
-// Här börjar vi lyssna efter inkommande anrop över localhost:8000
-
+app.get("/", (req, res) => {
+    res.send("Välkommen till produktdatabasen!");
+});
 
 app.listen(port, () => {
 

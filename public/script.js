@@ -1,14 +1,99 @@
 const form = document.querySelector(".product-form");
+const productName = document.querySelector("#name");
+const price = document.querySelector("#price");
+const sku = document.querySelector("#sku");
+const description = document.querySelector("#description");
 const productList = document.querySelector("tbody");
 
-form.addEventListener("submit", async (event) => {
+function addProductToTable(product) {
+    const emptyRow = productList.querySelector(".empty-row");
+    if (emptyRow) {
+        emptyRow.remove();
+    }
+
+    const newRow = document.createElement("tr");
+    const values = [product.name, product.sku, product.price + " kr"];
+
+    for (const value of values) {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        newRow.appendChild(cell);
+    }
+
+    const deleteCell = document.createElement("td");
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.textContent = "Ta bort";
+
+    deleteButton.addEventListener("click", async function () {
+        try {
+            const response = await fetch("/api/products/" + product.id, {
+                method: "DELETE"
+            });
+
+            if (response.status !== 204) {
+                throw new Error("Servern kunde inte ta bort produkten.");
+            }
+
+            newRow.remove();
+            showEmptyMessage();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    deleteCell.appendChild(deleteButton);
+    newRow.appendChild(deleteCell);
+    productList.appendChild(newRow);
+}
+
+function showEmptyMessage() {
+    if (productList.children.length > 0) {
+        return;
+    }
+
+    const emptyRow = document.createElement("tr");
+    emptyRow.className = "empty-row";
+
+    const messageCell = document.createElement("td");
+    messageCell.colSpan = 4;
+    messageCell.textContent = "Inga produkter att visa ännu.";
+
+    emptyRow.appendChild(messageCell);
+    productList.appendChild(emptyRow);
+}
+
+async function loadProducts() {
+    try {
+        const response = await fetch("/api/products");
+
+        if (!response.ok) {
+            throw new Error("Kunde inte hämta produkterna.");
+        }
+
+        const products = await response.json();
+
+        products.forEach(function (product) {
+            addProductToTable(product);
+        });
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const formData = new FormData(form);
+    const nameValue = productName.value.trim();
+    const priceValue = Number(price.value);
+    const skuValue = sku.value.trim();
+    const descriptionValue = description.value.trim();
+
     const product = {
-        name: String(formData.get("name") || "").trim(),
-        price: Number(formData.get("price")),
-        sku: String(formData.get("sku") || "").trim()
+        name: nameValue,
+        price: priceValue,
+        sku: skuValue,
+        description: descriptionValue
     };
 
     try {
@@ -17,23 +102,18 @@ form.addEventListener("submit", async (event) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(product)
         });
+
+        if (response.status !== 201) {
+            throw new Error("Servern kunde inte spara produkten.");
+        }
+
         const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.error || "Servern kunde inte spara produkten.");
-        }
-
-        productList.querySelector(".empty-row")?.remove();
-
-        const row = document.createElement("tr");
-        for (const value of [product.name, product.sku, `${product.price} kr`, ""]) {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        }
-        productList.appendChild(row);
+        product.id = result.id;
+        addProductToTable(product);
         form.reset();
     } catch (error) {
-        window.alert(`Kunde inte spara produkten: ${error.message}`);
+        alert("Kunde inte spara produkten: " + error.message);
     }
 });
+
+loadProducts();
